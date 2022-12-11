@@ -23,7 +23,7 @@ export class TasksController {
     await this.tasksService.createOrEditSchedule({
       cron: '*/5 * * * * *',
       jobName: 'testHandler',
-      jobHandler: 'jobHandler',  
+      jobHandler: 'jobHandler',
       params: '',
       desciption: '',
     });
