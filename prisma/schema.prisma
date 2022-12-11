@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model schedule_job {
+  job_id      Int      @id @default(autoincrement())
+  cron        String   @default("")
+  jobName     String   @default("")
+  jobHandler  String   @default("")
+  params      String   @db.VarChar(255)
+  desciption  String?  @db.VarChar(255)
+  status      Int      @default(-1)
+  create_by   String
+  update_by   String
+  create_time DateTime @default(now())
+  update_time DateTime @updatedAt
+}
