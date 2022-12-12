@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, Interval } from '@nestjs/schedule';
-import { PrismaService } from 'src/prisma.server';
+import { PrismaService } from '../../common/prisma/prisma.service';
 
 @Injectable()
 export class TasksService {

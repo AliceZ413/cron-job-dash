@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import NodeUUID from 'node-uuid';
-import { PrismaService } from 'src/prisma.server';
+import { PrismaService } from '../../common/prisma/prisma.service';
 
 @Injectable()
 export class ScheduleService implements OnModuleInit {
