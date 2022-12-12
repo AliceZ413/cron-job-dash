@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import NodeUUID from 'node-uuid';
+import { v4 } from 'node-uuid';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import * as schedule from 'node-schedule';
 
 @Injectable()
 export class ScheduleService implements OnModuleInit {
@@ -8,12 +9,36 @@ export class ScheduleService implements OnModuleInit {
 
   private readonly logger = new Logger(ScheduleService.name);
 
+  private scheduleStacks: Record<string, any> = {};
+
   async onModuleInit() {
     console.log('[onModuleInit] [ScheduleService]');
 
-    this.logger.log('[初始化定时任务] start');
+    this.logger.verbose('[初始化定时任务] start');
     // 查询启动状态的定时任务
-    // const schedules = await
+    const schedules = await this.prisma.schedule_job.findMany({
+      where: {
+        status: 0,
+        deleted: false,
+      },
+    });
+
+    // 循环注册定时任务
+    schedules.forEach(async (schedule) => {
+      this.logger.verbose(
+        `[注册job] name: ${schedule.jobName}, handler: ${schedule.jobHandler}`,
+      );
+      this.generateSchedule(
+        schedule.job_id,
+        schedule.cron,
+        schedule.jobName,
+        schedule.jobHandler,
+      );
+    });
+
+    this.logger.verbose(
+      `[初始化定时任务] 初始化定时任务数量: ${schedules.length}, 结束`,
+    );
   }
 
   async beforeApplicationShutdown() {
@@ -26,11 +51,22 @@ export class ScheduleService implements OnModuleInit {
     jobName: string,
     jobHandler: string,
   ) {
-    this.logger.log(
+    this.logger.verbose(
       `[创建定时任务]，任务ID：${id}，cron：${cron}，任务名：${jobName}，任务方法：${jobHandler}`,
     );
-    const uuid = NodeUUID.v4();
+
+    const uuid = v4();
     this.logger.log('uuid: ' + uuid);
+
+    // console.log((this.scheduleStacks[jobName] = 1));
+
+    // todo 不使用jobName（存在jobName相同的情况）
+    this.scheduleStacks[id] = schedule.scheduleJob(uuid, cron, async () => {
+      console.log('callback: ' + cron);
+      // await this.executeSchedule(id);
+    });
+
+    console.log(this.scheduleStacks);
   }
 
   testHandler(params: string) {
