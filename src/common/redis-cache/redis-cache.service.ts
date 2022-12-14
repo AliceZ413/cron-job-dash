@@ -8,7 +8,7 @@ export class RedisCacheService {
     private cacheManager: Cache,
   ) {}
 
-  set(key: string, value: string, ttl: number) {
+  set(key: string, value: string, ttl?: number) {
     this.cacheManager.set(key, value, { ttl });
   }
 

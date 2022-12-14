@@ -2,10 +2,14 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { v4 } from 'node-uuid';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import * as schedule from 'node-schedule';
+import { RedisCacheService } from 'src/common/redis-cache/redis-cache.service';
 
 @Injectable()
 export class ScheduleService implements OnModuleInit {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private redisCache: RedisCacheService,
+  ) {}
 
   private readonly logger = new Logger(ScheduleService.name);
 
@@ -63,10 +67,39 @@ export class ScheduleService implements OnModuleInit {
     // todo 不使用jobName（存在jobName相同的情况）
     this.scheduleStacks[id] = schedule.scheduleJob(uuid, cron, async () => {
       console.log(`[${id}] callback: ` + cron);
-      // await this.executeSchedule(id);
+      await this.execSchedule(id);
+    });
+    this.redisCache.set(`schedule_stacks:${uuid}`, `${jobName}-${Date.now()}`);
+  }
+
+  async execSchedule(id: number) {
+    const schedule = await this.prisma.schedule_job.findFirst({
+      where: {
+        job_id: id,
+        deleted: false,
+      },
     });
 
-    console.log(this.scheduleStacks);
+    try {
+      if (schedule.status === -1) {
+        // 任务状态停止，则取消当前任务
+        // 任务容错，防止用户取消不是用的当前的worker
+        // todo 取消定时任务
+        this.logger.verbose(`${schedule.job_id} ${schedule.jobName} 停止任务`);
+      } else {
+        // 执行任务
+        console.log(schedule.jobHandler);
+
+        await this[schedule.jobHandler](schedule.params);
+      }
+    } catch (err) {
+      this.logger.log(
+        `执行任务 ${schedule.job_id} ${
+          schedule.jobName
+        } 失败, 时间 ${new Date().toLocaleString()}`,
+      );
+      this.logger.error(err.message);
+    }
   }
 
   testHandler(params: string) {
