@@ -36,3 +36,7 @@ lerna-debug.log*
 
 # env var
 .env
+
+# npm manager
+package-lock.json
+yarn.lock
