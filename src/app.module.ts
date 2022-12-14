@@ -1,5 +1,6 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,9 +15,9 @@ import { TestModule } from './modules/test/test.module';
     TasksModule,
     TestScheduleModule,
     PrismaModule,
-    // RedisCacheModule,
-    CacheModule.register({ isGlobal: true }),
+    RedisCacheModule,
     TestModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [AppService],
