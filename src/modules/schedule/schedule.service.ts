@@ -62,7 +62,7 @@ export class ScheduleService implements OnModuleInit {
 
     // todo 不使用jobName（存在jobName相同的情况）
     this.scheduleStacks[id] = schedule.scheduleJob(uuid, cron, async () => {
-      console.log('callback: ' + cron);
+      console.log(`[${id}] callback: ` + cron);
       // await this.executeSchedule(id);
     });
 
