@@ -14,6 +14,7 @@ export class TasksController {
 
     const result = await this.tasksService.scheduleList({ page, size });
     return {
+      code: 0,
       data: result,
       message: 'success',
     };
@@ -37,6 +38,7 @@ export class TasksController {
       desciption,
     });
     return {
+      code: 0,
       message: 'success',
     };
   }
@@ -45,6 +47,7 @@ export class TasksController {
   async deleteSchedule(@Body('job_id') job_id: number) {
     await this.tasksService.deleteSchedule({ job_id });
     return {
+      code: 0,
       message: 'success',
     };
   }
@@ -56,6 +59,7 @@ export class TasksController {
   ) {
     await this.tasksService.updateScheduleStatus({ job_id, status });
     return {
+      code: 0,
       message: 'success',
     };
   }

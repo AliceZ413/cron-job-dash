@@ -9,6 +9,8 @@ import { ScheduleModule as TestScheduleModule } from './modules/schedule/schedul
 import { PrismaModule } from './common/prisma/prisma.module';
 import { RedisCacheModule } from './common/redis-cache/redis-cache.module';
 import { TestModule } from './modules/test/test.module';
+import { LoginModule } from './modules/login/login.module';
+import { UsersModule } from './modules/users/users.module';
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -18,6 +20,8 @@ import { TestModule } from './modules/test/test.module';
     RedisCacheModule,
     TestModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    LoginModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
